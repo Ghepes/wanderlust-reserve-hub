@@ -1,8 +1,10 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HotelCardProps {
+  id: string;
   name: string;
   image: string;
   location: string;
@@ -11,7 +13,13 @@ interface HotelCardProps {
   stars: number;
 }
 
-export const HotelCard = ({ name, image, location, price, rating, stars }: HotelCardProps) => {
+export const HotelCard = ({ id, name, image, location, price, rating, stars }: HotelCardProps) => {
+  const navigate = useNavigate();
+
+  const handleViewRates = () => {
+    navigate(`/hotel/${id}/rates`);
+  };
+
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg animate-fade-in">
       <div className="aspect-video relative overflow-hidden">
@@ -35,12 +43,15 @@ export const HotelCard = ({ name, image, location, price, rating, stars }: Hotel
           <div className="bg-booking-success/10 text-booking-success px-2 py-1 rounded">
             {rating}/10
           </div>
-          <p className="text-xl font-bold">${price}</p>
+          <p className="text-xl font-bold">From ${price}</p>
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full bg-booking-primary hover:bg-booking-secondary">
-          Book now
+        <Button 
+          className="w-full bg-booking-primary hover:bg-booking-secondary"
+          onClick={handleViewRates}
+        >
+          View Rates
         </Button>
       </CardFooter>
     </Card>

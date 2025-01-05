@@ -10,14 +10,20 @@ import { useNavigate } from "react-router-dom";
 
 export const SearchBar = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: undefined,
   });
 
   const handleSearch = () => {
-    navigate("/booking", {
+    if (!searchQuery) {
+      return;
+    }
+    
+    navigate("/search", {
       state: {
+        query: searchQuery,
         dates: date,
       }
     });
@@ -27,8 +33,10 @@ export const SearchBar = () => {
     <div className="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto -mt-8 relative z-10 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Input 
-          placeholder="Where are you going?"
+          placeholder="Where are you going? (city, country, or hotel)"
           className="md:col-span-1"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         
         <Popover>
