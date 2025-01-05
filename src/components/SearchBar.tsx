@@ -5,9 +5,23 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Users } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { useNavigate } from "react-router-dom";
 
 export const SearchBar = () => {
-  const [date, setDate] = useState<Date>();
+  const navigate = useNavigate();
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: undefined,
+  });
+
+  const handleSearch = () => {
+    navigate("/booking", {
+      state: {
+        dates: date,
+      }
+    });
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto -mt-8 relative z-10 animate-fade-in">
@@ -24,15 +38,27 @@ export const SearchBar = () => {
               className="w-full justify-start text-left font-normal md:col-span-1"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd")} - {format(date.to, "LLL dd")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd")
+                )
+              ) : (
+                <span>Pick dates</span>
+              )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
+          <PopoverContent className="w-auto p-0" align="start">
             <Calendar
-              mode="single"
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
               selected={date}
               onSelect={setDate}
-              initialFocus
+              numberOfMonths={2}
             />
           </PopoverContent>
         </Popover>
@@ -42,7 +68,10 @@ export const SearchBar = () => {
           2 adults · 0 children
         </Button>
 
-        <Button className="bg-booking-accent text-booking-primary hover:bg-booking-accent/90 md:col-span-1">
+        <Button 
+          className="bg-booking-accent text-booking-primary hover:bg-booking-accent/90 md:col-span-1"
+          onClick={handleSearch}
+        >
           Search
         </Button>
       </div>
