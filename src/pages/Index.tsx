@@ -1,12 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Header } from "@/components/Header";
+import { SearchBar } from "@/components/SearchBar";
+import { FeaturedHotels } from "@/components/FeaturedHotels";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="bg-booking-primary h-[300px] relative">
+        <div className="container mx-auto pt-20">
+          <div className="text-center text-white mb-12">
+            <h1 className="text-4xl font-bold mb-4">
+              Find your next stay
+            </h1>
+            <p className="text-xl">
+              Search deals on hotels, homes, and much more...
+            </p>
+          </div>
+        </div>
       </div>
+
+      <SearchBar />
+      <FeaturedHotels />
     </div>
   );
 };
