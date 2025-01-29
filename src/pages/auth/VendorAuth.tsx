@@ -71,6 +71,11 @@ export default function VendorAuth() {
         return;
       }
 
+      if (!signInData.user) {
+        toast.error("No user found");
+        return;
+      }
+
       // Verify the user is a vendor
       const { data: vendorData, error: vendorError } = await supabase
         .from('vendors')
@@ -107,16 +112,21 @@ export default function VendorAuth() {
         password: values.password,
       });
 
-      if (authError || !authData.user) {
+      if (authError) {
         console.error("Auth signup error:", authError);
-        toast.error(authError?.message || "Failed to create account");
+        toast.error(authError.message || "Failed to create account");
+        return;
+      }
+
+      if (!authData.user) {
+        toast.error("Failed to create user account");
         return;
       }
 
       console.log("Auth user created successfully:", authData.user.id);
 
       // Create the vendor record
-      const { error: vendorError } = await supabase
+      const { data: vendorData, error: vendorError } = await supabase
         .from("vendors")
         .insert([
           {
@@ -126,7 +136,9 @@ export default function VendorAuth() {
             contact_name: values.contact_name,
             phone: values.phone,
           },
-        ]);
+        ])
+        .select()
+        .single();
 
       if (vendorError) {
         console.error("Vendor creation error:", vendorError);
@@ -136,8 +148,15 @@ export default function VendorAuth() {
         return;
       }
 
-      console.log("Vendor record created successfully");
-      toast.success("Registration completed successfully! Please check your email to verify your account.");
+      if (!vendorData) {
+        console.error("No vendor data returned after insert");
+        await supabase.auth.signOut();
+        toast.error("Failed to create vendor profile");
+        return;
+      }
+
+      console.log("Vendor record created successfully:", vendorData);
+      toast.success("Registration successful! Please check your email to verify your account.");
       setIsLogin(true); // Switch to login form
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
@@ -149,7 +168,6 @@ export default function VendorAuth() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <header className="bg-booking-primary">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-white text-2xl font-bold">Booking.com</div>
