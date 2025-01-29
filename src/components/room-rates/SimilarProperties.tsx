@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Property {
   id: string;
@@ -16,20 +17,30 @@ interface SimilarPropertiesProps {
 }
 
 const SimilarProperties = ({ properties }: SimilarPropertiesProps) => {
+  const navigate = useNavigate();
+
+  const handlePropertyClick = (propertyId: string) => {
+    navigate(`/hotel/${propertyId}/rates`);
+  };
+
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-6">Similar Properties</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {properties.map((property) => (
-          <div key={property.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div 
+            key={property.id} 
+            className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
+            onClick={() => handlePropertyClick(property.id)}
+          >
             <img
               src={property.image}
               alt={property.name}
-              className="w-full h-48 object-cover"
+              className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
             />
             <div className="p-4">
-              <h3 className="font-semibold">{property.name}</h3>
-              <p className="text-gray-600 flex items-center gap-1">
+              <h3 className="font-semibold text-lg mb-2">{property.name}</h3>
+              <p className="text-gray-600 flex items-center gap-1 mb-2">
                 <MapPin className="h-4 w-4" />
                 {property.location}
               </p>

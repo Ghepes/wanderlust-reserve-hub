@@ -63,6 +63,33 @@ const RoomRates = () => {
       price: 199,
       rating: 8.8,
       stars: 4
+    },
+    {
+      id: "3",
+      name: "Riverside Luxury Hotel",
+      image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7",
+      location: "Budapest, Hungary",
+      price: 245,
+      rating: 9.1,
+      stars: 5
+    },
+    {
+      id: "4",
+      name: "Historic Palace Hotel",
+      image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+      location: "Budapest, Hungary",
+      price: 280,
+      rating: 9.3,
+      stars: 5
+    },
+    {
+      id: "5",
+      name: "Modern Design Hotel",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+      location: "Budapest, Hungary",
+      price: 185,
+      rating: 8.9,
+      stars: 4
     }
   ];
 
