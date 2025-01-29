@@ -126,7 +126,7 @@ export default function VendorAuth() {
       console.log("Auth user created successfully:", authData.user.id);
 
       // Create the vendor record
-      const { data: vendorData, error: vendorError } = await supabase
+      const { error: vendorError } = await supabase
         .from("vendors")
         .insert([
           {
@@ -136,9 +136,7 @@ export default function VendorAuth() {
             contact_name: values.contact_name,
             phone: values.phone,
           },
-        ])
-        .select()
-        .single();
+        ]);
 
       if (vendorError) {
         console.error("Vendor creation error:", vendorError);
@@ -148,14 +146,7 @@ export default function VendorAuth() {
         return;
       }
 
-      if (!vendorData) {
-        console.error("No vendor data returned after insert");
-        await supabase.auth.signOut();
-        toast.error("Failed to create vendor profile");
-        return;
-      }
-
-      console.log("Vendor record created successfully:", vendorData);
+      console.log("Vendor record created successfully");
       toast.success("Registration successful! Please check your email to verify your account.");
       setIsLogin(true); // Switch to login form
     } catch (error: any) {
@@ -189,9 +180,10 @@ export default function VendorAuth() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg p-6">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
           <div className="flex gap-4 mb-6">
             <Button
+              type="button"
               variant={isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(true)}
               disabled={isLoading}
@@ -200,10 +192,11 @@ export default function VendorAuth() {
               Login
             </Button>
             <Button
+              type="button"
               variant={!isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(false)}
               disabled={isLoading}
-              className={`flex-1 ${!isLogin ? 'bg-[#1a1b1f] text-white hover:bg-[#1a1b1f]/90' : ''}`}
+              className={`flex-1 ${!isLogin ? 'bg-booking-primary text-white hover:bg-booking-primary/90' : ''}`}
             >
               Register
             </Button>
@@ -217,17 +210,16 @@ export default function VendorAuth() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700">Email</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="email@example.com" 
                           type="email"
                           disabled={isLoading}
-                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage className="text-red-500" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -236,16 +228,15 @@ export default function VendorAuth() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700">Password</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input 
                           type="password" 
                           disabled={isLoading}
-                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage className="text-red-500" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -269,17 +260,16 @@ export default function VendorAuth() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700">Email</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="email@example.com" 
                           type="email"
                           disabled={isLoading}
-                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage className="text-red-500" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -366,7 +356,7 @@ export default function VendorAuth() {
                 />
                 <Button 
                   type="submit" 
-                  className="w-full bg-[#1a1b1f] hover:bg-[#1a1b1f]/90 text-white" 
+                  className="w-full bg-booking-primary hover:bg-booking-primary/90 text-white" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Loading..." : "Register"}
