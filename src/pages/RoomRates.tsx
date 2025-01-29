@@ -126,6 +126,10 @@ const RoomRates = () => {
     });
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   const room = roomTypes[0];
 
   return (
@@ -133,7 +137,7 @@ const RoomRates = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Button 
           variant="ghost" 
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

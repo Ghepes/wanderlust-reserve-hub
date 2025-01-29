@@ -20,7 +20,8 @@ const SimilarProperties = ({ properties }: SimilarPropertiesProps) => {
   const navigate = useNavigate();
 
   const handlePropertyClick = (propertyId: string) => {
-    navigate(`/hotel/${propertyId}/rates`);
+    // Navigate to the new property's rates page
+    navigate(`/hotel/${propertyId}/rates`, { replace: true });
   };
 
   return (
