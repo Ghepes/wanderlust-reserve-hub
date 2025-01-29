@@ -18,17 +18,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  company_name: z.string().min(2),
-  vat_number: z.string().min(2),
-  contact_name: z.string().min(2),
-  phone: z.string().min(6),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  company_name: z.string().min(2, "Company name must be at least 2 characters"),
+  vat_number: z.string().min(2, "VAT number must be at least 2 characters"),
+  contact_name: z.string().min(2, "Contact name must be at least 2 characters"),
+  phone: z.string().min(6, "Phone number must be at least 6 characters"),
 });
 
 export default function VendorAuth() {
@@ -57,46 +57,72 @@ export default function VendorAuth() {
 
   const onLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
+      console.log("Attempting login with:", { email: values.email });
       const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        toast.error(error.message);
+        return;
+      }
 
       toast.success("Logged in successfully");
       navigate("/vendor/dashboard");
     } catch (error: any) {
+      console.error("Login error:", error);
       toast.error(error.message);
     }
   };
 
   const onRegister = async (values: z.infer<typeof registerSchema>) => {
     try {
+      console.log("Attempting registration with:", { 
+        email: values.email,
+        company_name: values.company_name 
+      });
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth error during registration:", authError);
+        toast.error(authError.message);
+        return;
+      }
 
-      if (authData.user) {
-        const { error: vendorError } = await supabase.from("vendors").insert([
-          {
-            user_id: authData.user.id,
-            company_name: values.company_name,
-            vat_number: values.vat_number,
-            contact_name: values.contact_name,
-            phone: values.phone,
-          },
-        ]);
+      if (!authData.user) {
+        console.error("No user data returned after registration");
+        toast.error("Registration failed - no user data");
+        return;
+      }
 
-        if (vendorError) throw vendorError;
+      console.log("User registered successfully:", authData.user.id);
+
+      const { error: vendorError } = await supabase.from("vendors").insert([
+        {
+          user_id: authData.user.id,
+          company_name: values.company_name,
+          vat_number: values.vat_number,
+          contact_name: values.contact_name,
+          phone: values.phone,
+        },
+      ]);
+
+      if (vendorError) {
+        console.error("Vendor creation error:", vendorError);
+        toast.error(vendorError.message);
+        return;
       }
 
       toast.success("Registered successfully");
       navigate("/vendor/dashboard");
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast.error(error.message);
     }
   };
