@@ -30,6 +30,59 @@ export type Database = {
         }
         Relationships: []
       }
+      rooms: {
+        Row: {
+          amenities: string[] | null
+          capacity: number
+          created_at: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          name: string
+          price_per_night: number
+          room_type: Database["public"]["Enums"]["room_type"]
+          status: Database["public"]["Enums"]["room_status"] | null
+          updated_at: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          capacity: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          name: string
+          price_per_night: number
+          room_type: Database["public"]["Enums"]["room_type"]
+          status?: Database["public"]["Enums"]["room_status"] | null
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          amenities?: string[] | null
+          capacity?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          name?: string
+          price_per_night?: number
+          room_type?: Database["public"]["Enums"]["room_type"]
+          status?: Database["public"]["Enums"]["room_status"] | null
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -71,6 +124,39 @@ export type Database = {
           },
         ]
       }
+      vendors: {
+        Row: {
+          company_name: string
+          contact_name: string
+          created_at: string | null
+          id: string
+          phone: string
+          updated_at: string | null
+          user_id: string | null
+          vat_number: string
+        }
+        Insert: {
+          company_name: string
+          contact_name: string
+          created_at?: string | null
+          id?: string
+          phone: string
+          updated_at?: string | null
+          user_id?: string | null
+          vat_number: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string
+          created_at?: string | null
+          id?: string
+          phone?: string
+          updated_at?: string | null
+          user_id?: string | null
+          vat_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -79,7 +165,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      room_status: "available" | "maintenance" | "occupied"
+      room_type: "single" | "double" | "suite" | "apartment"
     }
     CompositeTypes: {
       [_ in never]: never

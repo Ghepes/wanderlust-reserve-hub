@@ -14,6 +14,13 @@ export const Header = () => {
           Booking.com
         </div>
         <div className="flex gap-4">
+          <Button 
+            variant="ghost" 
+            className="text-white hover:text-booking-accent"
+            onClick={() => navigate("/vendor/auth")}
+          >
+            Vendor Portal
+          </Button>
           <Button variant="ghost" className="text-white hover:text-booking-accent">
             List your property
           </Button>
