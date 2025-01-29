@@ -33,6 +33,7 @@ const registerSchema = z.object({
 
 export default function VendorAuth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -57,7 +58,9 @@ export default function VendorAuth() {
 
   const onLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
+      setIsLoading(true);
       console.log("Login attempt with email:", values.email);
+      
       const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -74,21 +77,17 @@ export default function VendorAuth() {
     } catch (error: any) {
       console.error("Unexpected login error:", error);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const onRegister = async (values: z.infer<typeof registerSchema>) => {
     try {
+      setIsLoading(true);
       console.log("Starting registration process for:", values.email);
       
-      // First, validate the form data
-      const validationResult = registerSchema.safeParse(values);
-      if (!validationResult.success) {
-        console.error("Validation errors:", validationResult.error);
-        return;
-      }
-
-      // Attempt to create the auth user
+      // First, create the auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
@@ -131,6 +130,8 @@ export default function VendorAuth() {
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,12 +144,14 @@ export default function VendorAuth() {
             <Button
               variant={isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(true)}
+              disabled={isLoading}
             >
               Login
             </Button>
             <Button
               variant={!isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(false)}
+              disabled={isLoading}
             >
               Register
             </Button>
@@ -164,7 +167,12 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
+                        <Input 
+                          placeholder="email@example.com" 
+                          type="email"
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -177,14 +185,18 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input 
+                          type="password" 
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Login
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Loading..." : "Login"}
                 </Button>
               </form>
             </Form>
@@ -201,7 +213,12 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
+                        <Input 
+                          placeholder="email@example.com" 
+                          type="email"
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,7 +231,11 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <Input 
+                          type="password"
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -227,7 +248,10 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Company Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -240,7 +264,10 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>VAT Number</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -253,7 +280,10 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Contact Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -266,14 +296,17 @@ export default function VendorAuth() {
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          disabled={isLoading}
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Register
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Loading..." : "Register"}
                 </Button>
               </form>
             </Form>
