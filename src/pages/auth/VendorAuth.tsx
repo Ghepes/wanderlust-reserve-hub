@@ -106,10 +106,23 @@ export default function VendorAuth() {
       setIsLoading(true);
       console.log("Starting registration process for:", values.email);
       
-      // First, create the auth user
+      // Check if user already exists
+      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers();
+      const existingUser = users?.find(user => user.email === values.email);
+      
+      if (existingUser) {
+        toast.error("An account with this email already exists. Please log in instead.");
+        setIsLogin(true);
+        return;
+      }
+
+      // Create the auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
       });
 
       if (authError) {
@@ -148,7 +161,7 @@ export default function VendorAuth() {
 
       console.log("Vendor record created successfully");
       toast.success("Registration successful! Please check your email to verify your account.");
-      setIsLogin(true); // Switch to login form
+      setIsLogin(true);
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
       toast.error(error.message);
