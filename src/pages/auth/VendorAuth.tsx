@@ -60,14 +60,29 @@ export default function VendorAuth() {
       setIsLoading(true);
       console.log("Login attempt with email:", values.email);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
-      if (error) {
-        console.error("Login error details:", error);
-        toast.error(error.message);
+      if (signInError) {
+        console.error("Login error:", signInError);
+        toast.error(signInError.message);
+        return;
+      }
+
+      // Verify the user is a vendor
+      const { data: vendorData, error: vendorError } = await supabase
+        .from('vendors')
+        .select('*')
+        .eq('user_id', signInData.user.id)
+        .single();
+
+      if (vendorError || !vendorData) {
+        console.error("Vendor verification error:", vendorError);
+        toast.error("Account not found or not authorized as vendor");
+        // Sign out the user since they're not a vendor
+        await supabase.auth.signOut();
         return;
       }
 
@@ -92,40 +107,38 @@ export default function VendorAuth() {
         password: values.password,
       });
 
-      if (authError) {
+      if (authError || !authData.user) {
         console.error("Auth signup error:", authError);
-        toast.error(authError.message);
-        return;
-      }
-
-      if (!authData.user) {
-        console.error("No user data returned after signup");
-        toast.error("Registration failed - no user data");
+        toast.error(authError?.message || "Failed to create account");
         return;
       }
 
       console.log("Auth user created successfully:", authData.user.id);
 
       // Create the vendor record
-      const { error: vendorError } = await supabase.from("vendors").insert([
-        {
-          user_id: authData.user.id,
-          company_name: values.company_name,
-          vat_number: values.vat_number,
-          contact_name: values.contact_name,
-          phone: values.phone,
-        },
-      ]);
+      const { error: vendorError } = await supabase
+        .from("vendors")
+        .insert([
+          {
+            user_id: authData.user.id,
+            company_name: values.company_name,
+            vat_number: values.vat_number,
+            contact_name: values.contact_name,
+            phone: values.phone,
+          },
+        ]);
 
       if (vendorError) {
         console.error("Vendor creation error:", vendorError);
-        toast.error(`Failed to create vendor: ${vendorError.message}`);
+        // If vendor creation fails, we should clean up the auth user
+        await supabase.auth.signOut();
+        toast.error(`Failed to create vendor profile: ${vendorError.message}`);
         return;
       }
 
       console.log("Vendor record created successfully");
-      toast.success("Registration completed successfully");
-      navigate("/vendor/dashboard");
+      toast.success("Registration completed successfully! Please check your email to verify your account.");
+      setIsLogin(true); // Switch to login form
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
       toast.error(error.message);
