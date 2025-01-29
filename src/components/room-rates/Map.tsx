@@ -1,7 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -12,60 +10,58 @@ interface MapProps {
 }
 
 const Map = ({ latitude, longitude, hotelName }: MapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
+  const [googleMapsKey, setGoogleMapsKey] = useState('');
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  const [showInfoWindow, setShowInfoWindow] = useState(false);
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    try {
-      mapboxgl.accessToken = mapboxToken;
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [longitude, latitude],
-        zoom: 14
-      });
-
-      // Add marker
-      new mapboxgl.Marker()
-        .setLngLat([longitude, latitude])
-        .setPopup(new mapboxgl.Popup().setHTML(`<h3>${hotelName}</h3>`))
-        .addTo(map.current);
-
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      setIsMapInitialized(true);
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
+  const mapContainerStyle = {
+    width: '100%',
+    height: '100%',
+    borderRadius: '0.5rem'
   };
 
-  useEffect(() => {
-    return () => {
-      map.current?.remove();
-    };
-  }, []);
+  const center = {
+    lat: latitude,
+    lng: longitude
+  };
+
+  const options = {
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: true,
+  };
+
+  const handleInitializeMap = () => {
+    if (googleMapsKey) {
+      setIsMapInitialized(true);
+    }
+  };
 
   if (!isMapInitialized) {
     return (
       <div className="bg-gray-100 rounded-lg p-4 mb-6">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Please enter your Mapbox public token to view the map. 
-            You can get one at <a href="https://www.mapbox.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
+            Please enter your Google Maps API key to view the map. 
+            You can get one at{' '}
+            <a 
+              href="https://console.cloud.google.com/google/maps-apis/credentials" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-500 hover:underline"
+            >
+              Google Cloud Console
+            </a>
           </p>
           <Input
             type="text"
-            placeholder="Enter your Mapbox token"
-            value={mapboxToken}
-            onChange={(e) => setMapboxToken(e.target.value)}
+            placeholder="Enter your Google Maps API key"
+            value={googleMapsKey}
+            onChange={(e) => setGoogleMapsKey(e.target.value)}
           />
-          <Button onClick={initializeMap} className="w-full">
+          <Button onClick={handleInitializeMap} className="w-full">
             Initialize Map
           </Button>
         </div>
@@ -76,7 +72,30 @@ const Map = ({ latitude, longitude, hotelName }: MapProps) => {
   return (
     <div className="bg-gray-100 rounded-lg p-4 mb-6">
       <div className="aspect-square relative">
-        <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+        <LoadScript googleMapsApiKey={googleMapsKey}>
+          <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={center}
+            zoom={14}
+            options={options}
+          >
+            <Marker
+              position={center}
+              onClick={() => setShowInfoWindow(true)}
+            >
+              {showInfoWindow && (
+                <InfoWindow
+                  position={center}
+                  onCloseClick={() => setShowInfoWindow(false)}
+                >
+                  <div>
+                    <h3 className="font-semibold">{hotelName}</h3>
+                  </div>
+                </InfoWindow>
+              )}
+            </Marker>
+          </GoogleMap>
+        </LoadScript>
       </div>
     </div>
   );
