@@ -17,13 +17,25 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z
+    .string()
+    .email("Please enter a valid email address")
+    .min(1, "Email is required"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .max(72, "Password must be less than 72 characters"),
 });
 
 const registerSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z
+    .string()
+    .email("Please enter a valid email address")
+    .min(1, "Email is required"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .max(72, "Password must be less than 72 characters"),
   company_name: z.string().min(2, "Company name must be at least 2 characters"),
   vat_number: z.string().min(2, "VAT number must be at least 2 characters"),
   contact_name: z.string().min(2, "Contact name must be at least 2 characters"),
@@ -105,27 +117,26 @@ export default function VendorAuth() {
     try {
       setIsLoading(true);
       console.log("Starting registration process for:", values.email);
-      
-      // Check if user already exists
-      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers();
-      const existingUser = users?.find(user => user.email === values.email);
-      
-      if (existingUser) {
-        toast.error("An account with this email already exists. Please log in instead.");
-        setIsLogin(true);
-        return;
-      }
 
-      // Create the auth user
+      // Create the auth user with email confirmation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            company_name: values.company_name,
+            contact_name: values.contact_name,
+          }
         }
       });
 
       if (authError) {
+        if (authError.message.includes("already registered")) {
+          toast.error("An account with this email already exists. Please log in instead.");
+          setIsLogin(true);
+          return;
+        }
         console.error("Auth signup error:", authError);
         toast.error(authError.message || "Failed to create account");
         return;
