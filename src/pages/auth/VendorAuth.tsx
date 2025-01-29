@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/Header";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -136,15 +135,36 @@ export default function VendorAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-booking-primary">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="text-white text-2xl font-bold">Booking.com</div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="text-white hover:text-booking-accent">
+              Vendor Portal
+            </a>
+            <a href="#" className="text-white hover:text-booking-accent">
+              List your property
+            </a>
+            <Button 
+              variant="secondary"
+              className="bg-booking-accent hover:bg-booking-accent/90 text-booking-secondary font-semibold"
+            >
+              Sign in
+            </Button>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between mb-6">
+        <div className="max-w-md mx-auto bg-white rounded-lg p-6">
+          <div className="flex gap-4 mb-6">
             <Button
               variant={isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(true)}
               disabled={isLoading}
+              className={`flex-1 ${isLogin ? 'bg-booking-primary text-white hover:bg-booking-primary/90' : ''}`}
             >
               Login
             </Button>
@@ -152,6 +172,7 @@ export default function VendorAuth() {
               variant={!isLogin ? "default" : "ghost"}
               onClick={() => setIsLogin(false)}
               disabled={isLoading}
+              className={`flex-1 ${!isLogin ? 'bg-[#1a1b1f] text-white hover:bg-[#1a1b1f]/90' : ''}`}
             >
               Register
             </Button>
@@ -165,16 +186,17 @@ export default function VendorAuth() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-gray-700">Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="email@example.com" 
                           type="email"
                           disabled={isLoading}
+                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
@@ -183,19 +205,24 @@ export default function VendorAuth() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-gray-700">Password</FormLabel>
                       <FormControl>
                         <Input 
                           type="password" 
                           disabled={isLoading}
+                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-booking-primary hover:bg-booking-primary/90 text-white" 
+                  disabled={isLoading}
+                >
                   {isLoading ? "Loading..." : "Login"}
                 </Button>
               </form>
@@ -211,16 +238,17 @@ export default function VendorAuth() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-gray-700">Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="email@example.com" 
                           type="email"
                           disabled={isLoading}
+                          className="border-gray-300 focus:border-booking-primary focus:ring-booking-primary"
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
@@ -305,7 +333,11 @@ export default function VendorAuth() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-[#1a1b1f] hover:bg-[#1a1b1f]/90 text-white" 
+                  disabled={isLoading}
+                >
                   {isLoading ? "Loading..." : "Register"}
                 </Button>
               </form>
